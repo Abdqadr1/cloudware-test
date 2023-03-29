@@ -10,6 +10,7 @@ function alarm(body) {
       const notification = new Notification("Sunrise/Sunset Alarm", {body});
 
       notification.onclick = e => {
+          window.parent.focus();
           notification.close();
       }
   } else if (Notification.permission !== "denied") {
@@ -23,13 +24,6 @@ function Alarm() {
     const abortRef = useRef(new AbortController());
     const [isLoading, setLoading] = useState(true);
 
-    if (!("Notification" in window)) {
-         Notification.requestPermission().then((permission) => {
-        if (permission === "denied") {
-            alert('Cannot send notification!');
-        }
-        });
-    }
 
     const offset = +1;
 
@@ -69,6 +63,15 @@ function Alarm() {
     }
 
     useEffect(() => {
+
+        if (("Notification" in window)) {
+            Notification.requestPermission().then((permission) => {
+            if (permission === "denied") {
+                alert('Cannot send notification!');
+            }
+            });
+        }
+
         setLoading(true);
         const url = `https://api.sunrisesunset.io/json?lat=7.398980&lng=3.920400&timezone=UTC&date=today`;
         axios.get(url,
@@ -83,7 +86,6 @@ function Alarm() {
             .then(res => {
                 console.log(res.data);
                 setData({...res.data.results});
-                sendNotification(res.data.results);
             })
             .catch(err => { console.warn(err) })
             .finally(() => { setLoading(false); })
@@ -92,7 +94,13 @@ function Alarm() {
         //   abortRef.current.abort();
       };
     }, [])
-   
+
+    useEffect(() => {
+        if (data?.sunrise) {
+            
+            sendNotification(data);
+        }
+    }, [data])
 
 
     const loading = (<div className="spinner-border" role="status">
@@ -124,8 +132,8 @@ if (document.getElementById('alarm-app')) {
     const Index = ReactDOM.createRoot(document.getElementById("alarm-app"));
 
     Index.render(
-        <React.StrictMode>
+        // <React.StrictMode>
             <Alarm/>
-        </React.StrictMode>
+        // </React.StrictMode>
     )
 }

@@ -27,7 +27,7 @@ function BankTransfer() {
     
     return (
         <div className="row mx-0 justify-content-center mt-5 text-center g-3">
-            <div className="col-12 col-md-10 border p-4">
+            <div className="col-12 col-md-8 border p-4">
             {
                 isNext     
                         ? <Transfer next={proceed} bankDetail={bankDetail} changeInput={changeInput} setNext={setNext} />
